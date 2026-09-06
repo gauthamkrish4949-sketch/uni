@@ -1,0 +1,13 @@
+com\collegestore\unistore\UnistoreApplication.class
+com\collegestore\unistore\repository\ProductRepository.class
+com\collegestore\unistore\model\Cart.class
+com\collegestore\unistore\model\Order.class
+com\collegestore\unistore\model\Product.class
+com\collegestore\unistore\controller\AdminController.class
+com\collegestore\unistore\repository\OrderRepository.class
+com\collegestore\unistore\model\User.class
+com\collegestore\unistore\controller\StoreController.class
+com\collegestore\unistore\controller\AuthController.class
+com\collegestore\unistore\controller\PrintController.class
+com\collegestore\unistore\repository\UserRepository.class
+com\collegestore\unistore\repository\CartRepository.class

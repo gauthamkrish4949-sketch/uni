@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head><title>Payment Summary</title></head>
+<body>
+    <h2>Print Job Order Created</h2>
+    <p><strong>Student:</strong> <span th:text="${order.studentName}"></span></p>
+    <p><strong>Class:</strong> <span th:text="${order.userClass}"></span></p>
+    <p><strong>Details:</strong> <span th:text="${order.details}"></span></p>
+    <h3>Total Payable Amount: ₹<span th:text="${order.totalAmount}"></span></h3>
+    <p>Please pay at the store counter upon document pickup.</p>
+    <a href="/store">Back to Store</a>
+</body>
+</html>

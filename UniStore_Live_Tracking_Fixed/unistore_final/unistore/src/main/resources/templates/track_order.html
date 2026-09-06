@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Track Order | UniStore</title>
+<link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="tracking-page">
+<header class="topbar">
+  <a class="brand" href="/store">Uni<span>Store</span></a>
+  <nav class="nav"><a href="/store">Store</a><a href="/orders">My Orders</a><a href="/logout">Logout</a></nav>
+</header>
+
+<main class="container">
+  <a class="back" href="/orders">← Back to orders</a>
+  <section class="track-card live-track-card">
+    <div class="order-top">
+      <div>
+        <span class="eyebrow dark">LIVE ORDER TRACKING</span>
+        <h1>Order #<span th:text="${order.id}">1</span></h1>
+        <span class="live-indicator"><i></i> Updates automatically</span>
+      </div>
+      <span id="orderStatus" class="status" th:text="${statusLabel}">PLACED</span>
+    </div>
+
+    <p class="muted" th:text="${order.details}">Order details</p>
+
+    <div class="current-stage" id="currentStage">
+      <span class="stage-icon">✓</span>
+      <div><strong id="stageTitle">Order placed</strong><small id="stageText">Your request has been received.</small></div>
+    </div>
+
+    <div class="timeline" id="timeline" th:data-rank="${statusRank}">
+      <div class="timeline-step" data-step="1"><i>1</i><div><b>Order placed</b><small>Your request has been received.</small></div></div>
+      <div class="timeline-step" data-step="2"><i>2</i><div><b>Confirmed</b><small>Store has accepted the order.</small></div></div>
+      <div class="timeline-step" data-step="3"><i>3</i><div><b>Packed</b><small>Your items are being prepared.</small></div></div>
+      <div class="timeline-step" data-step="4"><i>4</i><div><b>Ready for pickup</b><small>Collect it from the campus store.</small></div></div>
+      <div class="timeline-step" data-step="5"><i>5</i><div><b>Completed</b><small>Order successfully handed over.</small></div></div>
+    </div>
+
+    <div class="track-summary">
+      <div><span>Student</span><b th:text="${order.studentName}">Student</b></div>
+      <div><span>Class</span><b th:text="${order.userClass}">Class</b></div>
+      <div><span>Total</span><b>₹<span th:text="${#numbers.formatDecimal(order.totalAmount,1,2)}">0</span></b></div>
+      <div><span>Payment</span><b th:text="${order.paymentMethod}">PAY_AT_COUNTER</b></div>
+    </div>
+
+    <div class="cancelled" id="cancelledBox" th:if="${order.status=='CANCELLED'}">This order has been cancelled. Please contact the campus store for assistance.</div>
+  </section>
+</main>
+
+<script th:inline="javascript">
+const orderId = /*[[${order.id}]]*/ 0;
+const stageInfo = {
+  1: ['Order placed','Your request has been received.'],
+  2: ['Confirmed','The campus store has accepted your order.'],
+  3: ['Packed','Your items are being prepared.'],
+  4: ['Ready for pickup','Your order is ready to collect from the campus store.'],
+  5: ['Completed','Order successfully handed over.']
+};
+function paintTracker(rank,status){
+  const timeline=document.getElementById('timeline');
+  timeline.dataset.rank=rank;
+  document.querySelectorAll('.timeline-step').forEach(step=>{
+    const n=Number(step.dataset.step);
+    step.classList.toggle('done', rank>0 && n<=rank);
+    step.classList.toggle('current', rank>0 && n===rank);
+  });
+  const badge=document.getElementById('orderStatus');
+  badge.textContent=(status==='READY_FOR_PICKUP'?'READY':status);
+  badge.className='status status-'+String(status).toLowerCase();
+  const title=document.getElementById('stageTitle');
+  const text=document.getElementById('stageText');
+  if(status==='CANCELLED'){
+    title.textContent='Order cancelled'; text.textContent='Please contact the campus store for assistance.';
+    document.getElementById('currentStage').classList.add('cancelled-stage');
+  } else {
+    const info=stageInfo[rank]||stageInfo[1]; title.textContent=info[0]; text.textContent=info[1];
+  }
+}
+paintTracker(Number(document.getElementById('timeline').dataset.rank)||1, /*[[${order.status}]]*/ 'PLACED');
+let lastStatus=/*[[${order.status}]]*/ 'PLACED';
+async function refreshOrder(){
+  try{
+    const r=await fetch('/api/orders/'+orderId+'/status',{cache:'no-store',headers:{'Accept':'application/json'}});
+    if(!r.ok)return;
+    const d=await r.json();
+    if(!d.found || !d.authenticated){ window.location.href='/orders'; return; }
+    if(d.status!==lastStatus){
+      lastStatus=d.status;
+      paintTracker(Number(d.statusRank)||1,d.status);
+      document.querySelector('.live-track-card').classList.remove('status-updated');
+      void document.querySelector('.live-track-card').offsetWidth;
+      document.querySelector('.live-track-card').classList.add('status-updated');
+    }
+  }catch(e){}
+}
+setInterval(refreshOrder,3000);
+</script>
+</body>
+</html>

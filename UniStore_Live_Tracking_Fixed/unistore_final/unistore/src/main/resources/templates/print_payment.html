@@ -1,1 +1,311 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
 
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+    name="viewport"
+    content="width=device-width,initial-scale=1">
+
+<title>Print Payment | UniStore</title>
+
+<link
+    rel="stylesheet"
+    href="/css/style.css">
+
+</head>
+
+
+<body>
+
+<header class="topbar">
+
+<a class="brand" href="/store">
+    Uni<span>Store</span>
+</a>
+
+<nav class="nav">
+
+<a href="/store">Home</a>
+
+<a href="/print">
+    Print Service
+</a>
+
+<a href="/orders">
+    My Orders
+</a>
+
+<a href="/logout">
+    Logout
+</a>
+
+</nav>
+
+</header>
+
+
+<main class="container payment-page">
+
+<section
+    class="payment-card payment-card-centered">
+
+
+<span class="eyebrow dark">
+    DEMO UPI PAYMENT
+</span>
+
+
+<h1>
+    Pay for your print order
+</h1>
+
+
+<p class="muted">
+
+This is an academic project demo.
+Use the image below as the payment
+placeholder, then upload your payment
+screenshot.
+
+</p>
+
+
+<div class="payment-amount">
+
+<span>
+    Amount to pay
+</span>
+
+<strong>
+
+₹<span
+    th:text="${#numbers.formatDecimal(total,1,2)}">
+    0.00
+</span>
+
+</strong>
+
+</div>
+
+
+<div class="fake-qr-wrap">
+
+<div class="fake-qr-label">
+    SCAN &amp; PAY
+</div>
+
+
+<img
+    th:src="@{/images/payment-demo.jpg}"
+    alt="Demo payment image">
+
+
+<p>
+
+😎 <b>
+Totally legitimate QR
+</b>
+
+</p>
+
+
+<small>
+
+Just a sarcastic image for
+the college project demo.
+
+</small>
+
+</div>
+
+
+<div class="payment-details centered-details">
+
+
+<div>
+
+<span>
+Student
+</span>
+
+<b th:text="${studentName}">
+Student
+</b>
+
+</div>
+
+
+<div>
+
+<span>
+Class / Department
+</span>
+
+<b th:text="${userClass}">
+Class
+</b>
+
+</div>
+
+
+<div>
+
+<span>
+Print job
+</span>
+
+<b>
+
+<span th:text="${pages}">
+1
+</span>
+
+pages •
+
+<span th:text="${printType}">
+BW
+</span>
+
+</b>
+
+</div>
+
+</div>
+
+
+<div
+    th:if="${error}"
+    class="error"
+    th:text="${error}">
+</div>
+
+
+<form
+    class="form payment-upload-form centered-upload"
+    action="/checkout_print_upi"
+    method="post"
+    enctype="multipart/form-data">
+
+
+<label for="printPaymentScreenshot">
+
+Upload payment screenshot
+
+</label>
+
+
+<input
+    id="printPaymentScreenshot"
+    type="file"
+    name="paymentScreenshot"
+    accept="image/jpeg,image/png,image/webp"
+    required>
+
+
+<p class="tiny">
+
+JPG, PNG or WEBP • Maximum 5 MB
+
+</p>
+
+
+<img
+    id="printScreenshotPreview"
+    class="screenshot-preview"
+    alt="Payment screenshot preview"
+    style="display:none">
+
+
+<button
+    class="btn green full"
+    type="submit">
+
+✓ I Have Paid – Place Print Order
+
+</button>
+
+
+</form>
+
+
+<a
+    class="cancel-payment"
+    href="/print">
+
+← Back to print service
+
+</a>
+
+
+</section>
+
+</main>
+
+
+<script>
+
+const input =
+    document.getElementById(
+        'printPaymentScreenshot'
+    );
+
+
+const preview =
+    document.getElementById(
+        'printScreenshotPreview'
+    );
+
+
+input.addEventListener(
+    'change',
+    () => {
+
+        const file =
+            input.files[0];
+
+
+        if (!file) {
+
+            preview.style.display =
+                'none';
+
+            return;
+        }
+
+
+        if (
+            file.size >
+            5 * 1024 * 1024
+        ) {
+
+            alert(
+                'Please choose an image smaller than 5 MB.'
+            );
+
+            input.value = '';
+
+            preview.style.display =
+                'none';
+
+            return;
+        }
+
+
+        preview.src =
+            URL.createObjectURL(file);
+
+
+        preview.style.display =
+            'block';
+
+    }
+);
+
+</script>
+
+</body>
+
+</html>

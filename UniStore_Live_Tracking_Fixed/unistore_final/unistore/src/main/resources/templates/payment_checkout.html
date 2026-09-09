@@ -3,17 +3,187 @@
 
 <head>
 
-<meta charset="UTF-8">
+    <meta charset="UTF-8">
 
-<meta
-    name="viewport"
-    content="width=device-width,initial-scale=1">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1">
 
-<title>UPI Payment | UniStore</title>
+    <title>UPI Payment | UniStore</title>
 
-<link
-    rel="stylesheet"
-    href="/css/style.css">
+    <link rel="stylesheet"
+          href="/css/style.css">
+
+    <style>
+
+        .payment-page {
+            display: flex;
+            justify-content: center;
+            padding: 40px 20px;
+        }
+
+        .payment-card-centered {
+            width: 100%;
+            max-width: 650px;
+            text-align: center;
+            margin: 0 auto;
+        }
+
+        .payment-card-centered h1 {
+            margin-bottom: 10px;
+        }
+
+        .payment-card-centered .muted {
+            max-width: 560px;
+            margin: 0 auto 25px;
+            line-height: 1.6;
+        }
+
+        .payment-amount {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 450px;
+            margin: 25px auto;
+            padding: 18px 24px;
+            border-radius: 14px;
+            background: #f4f6f8;
+        }
+
+        .payment-amount span {
+            color: #666;
+            font-size: 16px;
+        }
+
+        .payment-amount strong {
+            font-size: 28px;
+        }
+
+        .fake-qr-wrap {
+            width: 320px;
+            max-width: 100%;
+            margin: 25px auto;
+            padding: 20px;
+            border: 1px dashed #b8bec7;
+            border-radius: 18px;
+            text-align: center;
+            background: #fff;
+            box-sizing: border-box;
+        }
+
+        .fake-qr-label {
+            font-weight: 800;
+            letter-spacing: 2px;
+            margin-bottom: 15px;
+        }
+
+        .fake-qr-wrap img {
+            display: block;
+            width: 100%;
+            max-width: 260px;
+            height: 260px;
+            object-fit: contain;
+            margin: 0 auto 15px;
+            border-radius: 12px;
+        }
+
+        .fake-qr-wrap p {
+            margin: 8px 0 4px;
+            font-size: 16px;
+        }
+
+        .fake-qr-wrap small {
+            display: block;
+            color: #777;
+            line-height: 1.4;
+        }
+
+        .payment-details {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            max-width: 560px;
+            margin: 25px auto;
+        }
+
+        .payment-details > div {
+            flex: 1;
+            padding: 16px;
+            border-radius: 14px;
+            background: #f6f6f6;
+            text-align: center;
+        }
+
+        .payment-details span {
+            display: block;
+            color: #777;
+            font-size: 14px;
+            margin-bottom: 6px;
+        }
+
+        .payment-details b {
+            display: block;
+            font-size: 16px;
+            word-break: break-word;
+        }
+
+        .centered-upload {
+            max-width: 540px;
+            margin: 30px auto 0;
+            text-align: center;
+        }
+
+        .centered-upload label {
+            display: block;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .centered-upload input[type="file"] {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 10px;
+            border: 1px solid #d7dce2;
+            border-radius: 10px;
+            background: #fff;
+        }
+
+        .screenshot-preview {
+            display: block;
+            max-width: 280px;
+            max-height: 300px;
+            margin: 18px auto;
+            border-radius: 12px;
+            object-fit: contain;
+        }
+
+        .cancel-payment {
+            display: inline-block;
+            margin-top: 20px;
+            text-decoration: none;
+        }
+
+        @media (max-width: 600px) {
+
+            .payment-details {
+                flex-direction: column;
+            }
+
+            .payment-amount {
+                padding: 16px;
+            }
+
+            .payment-amount strong {
+                font-size: 23px;
+            }
+
+            .fake-qr-wrap img {
+                width: 220px;
+                height: 220px;
+            }
+
+        }
+
+    </style>
 
 </head>
 
@@ -37,153 +207,174 @@
 
 <main class="container payment-page">
 
-<section class="payment-card payment-card-centered">
+    <section class="payment-card payment-card-centered">
 
-    <span class="eyebrow dark">
-        DEMO UPI PAYMENT
-    </span>
-
-    <h1>
-        Complete your payment
-    </h1>
-
-    <p class="muted">
-        This is an academic project demo.
-        Use the image below as the payment
-        placeholder, then upload your
-        payment screenshot.
-    </p>
-
-
-    <div class="payment-amount">
-
-        <span>
-            Amount to pay
+        <span class="eyebrow dark">
+            DEMO UPI PAYMENT
         </span>
 
-        <strong>
-            ₹<span
-                th:text="${#numbers.formatDecimal(total,1,2)}">
-                0.00
+        <h1>
+            Complete your payment
+        </h1>
+
+        <p class="muted">
+            This is an academic project demo.
+            Use the image below as the payment
+            placeholder, then upload your
+            payment screenshot.
+        </p>
+
+
+        <!-- PAYMENT AMOUNT -->
+
+        <div class="payment-amount">
+
+            <span>
+                Amount to pay
             </span>
-        </strong>
 
-    </div>
+            <strong>
+                ₹<span th:text="${#numbers.formatDecimal(total,1,2)}">
+                    0.00
+                </span>
+            </strong>
 
-
-    <div class="fake-qr-wrap">
-
-        <div class="fake-qr-label">
-            SCAN &amp; PAY
         </div>
 
-        <img
-            th:src="@{/images/payment-demo.jpg}"
-            alt="Demo payment image">
 
-        <p>
-            😎 <b>Totally legitimate QR</b>
-        </p>
+        <!-- DEMO PAYMENT IMAGE -->
 
-        <small>
-            Just a sarcastic image for
-            the college project demo.
-        </small>
+        <div class="fake-qr-wrap">
 
-    </div>
+            <div class="fake-qr-label">
+                SCAN &amp; PAY
+            </div>
 
+            <!-- IMPORTANT:
+                 The image is payment-demo.jpeg,
+                 not payment-demo.jpg -->
 
-    <div class="payment-details centered-details">
+            <img
+                th:src="@{/images/payment-demo.jpeg}"
+                src="/images/payment-demo.jpeg"
+                alt="Demo payment image">
 
-        <div>
-            <span>Student</span>
+            <p>
+                😎 <b>Totally legitimate QR</b>
+            </p>
 
-            <b th:text="${studentName}">
-                Student
-            </b>
+            <small>
+                Just a sarcastic image for
+                the college project demo.
+            </small>
+
         </div>
 
-        <div>
-            <span>Class / Department</span>
 
-            <b th:text="${userClass}">
-                Class
-            </b>
+        <!-- STUDENT DETAILS -->
+
+        <div class="payment-details centered-details">
+
+            <div>
+
+                <span>
+                    Student
+                </span>
+
+                <b th:text="${studentName}">
+                    Student
+                </b>
+
+            </div>
+
+
+            <div>
+
+                <span>
+                    Class / Department
+                </span>
+
+                <b th:text="${userClass}">
+                    Class
+                </b>
+
+            </div>
+
         </div>
 
-    </div>
+
+        <!-- PAYMENT SCREENSHOT UPLOAD -->
+
+        <form
+            class="form payment-upload-form centered-upload"
+            action="/checkout_stationery"
+            method="post"
+            enctype="multipart/form-data">
 
 
-    <form
-        class="form payment-upload-form centered-upload"
-        action="/checkout_stationery"
-        method="post"
-        enctype="multipart/form-data">
+            <input
+                type="hidden"
+                name="studentName"
+                th:value="${studentName}">
 
 
-        <input
-            type="hidden"
-            name="studentName"
-            th:value="${studentName}">
+            <input
+                type="hidden"
+                name="userClass"
+                th:value="${userClass}">
 
 
-        <input
-            type="hidden"
-            name="userClass"
-            th:value="${userClass}">
+            <input
+                type="hidden"
+                name="paymentMethod"
+                value="UPI_PAYMENT">
 
 
-        <input
-            type="hidden"
-            name="paymentMethod"
-            value="UPI_PAYMENT">
+            <label for="paymentScreenshot">
+                Upload payment screenshot
+            </label>
 
 
-        <label for="paymentScreenshot">
-            Upload payment screenshot
-        </label>
+            <input
+                id="paymentScreenshot"
+                type="file"
+                name="paymentScreenshot"
+                accept="image/jpeg,image/png,image/webp"
+                required>
 
 
-        <input
-            id="paymentScreenshot"
-            type="file"
-            name="paymentScreenshot"
-            accept="image/jpeg,image/png,image/webp"
-            required>
+            <p class="tiny">
+                JPG, PNG or WEBP • Maximum 5 MB
+            </p>
 
 
-        <p class="tiny">
-            JPG, PNG or WEBP • Maximum 5 MB
-        </p>
+            <img
+                id="screenshotPreview"
+                class="screenshot-preview"
+                alt="Payment screenshot preview"
+                style="display:none">
 
 
-        <img
-            id="screenshotPreview"
-            class="screenshot-preview"
-            alt="Payment screenshot preview"
-            style="display:none">
+            <button
+                class="btn green full"
+                type="submit">
+
+                ✓ I Have Paid – Complete Order
+
+            </button>
+
+        </form>
 
 
-        <button
-            class="btn green full"
-            type="submit">
+        <a
+            class="cancel-payment"
+            href="/cart">
 
-            ✓ I Have Paid – Complete Order
+            ← Back to cart
 
-        </button>
+        </a>
 
-    </form>
-
-
-    <a
-        class="cancel-payment"
-        href="/cart">
-
-        ← Back to cart
-
-    </a>
-
-</section>
+    </section>
 
 </main>
 
@@ -191,58 +382,59 @@
 <script>
 
 const input =
-    document.getElementById(
-        'paymentScreenshot'
-    );
+    document.getElementById('paymentScreenshot');
 
 const preview =
-    document.getElementById(
-        'screenshotPreview'
-    );
+    document.getElementById('screenshotPreview');
 
 
-input.addEventListener(
-    'change',
-    () => {
+input.addEventListener('change', function () {
 
-        const file =
-            input.files[0];
+    const file = input.files[0];
 
-        if (!file) {
+    if (!file) {
 
-            preview.style.display =
-                'none';
+        preview.style.display = 'none';
 
-            return;
-        }
-
-
-        if (
-            file.size >
-            5 * 1024 * 1024
-        ) {
-
-            alert(
-                'Please choose an image smaller than 5 MB.'
-            );
-
-            input.value = '';
-
-            preview.style.display =
-                'none';
-
-            return;
-        }
-
-
-        preview.src =
-            URL.createObjectURL(file);
-
-        preview.style.display =
-            'block';
-
+        return;
     }
-);
+
+
+    if (file.size > 5 * 1024 * 1024) {
+
+        alert(
+            'Please choose an image smaller than 5 MB.'
+        );
+
+        input.value = '';
+
+        preview.style.display = 'none';
+
+        return;
+    }
+
+
+    if (!file.type.startsWith('image/')) {
+
+        alert(
+            'Please choose a valid image file.'
+        );
+
+        input.value = '';
+
+        preview.style.display = 'none';
+
+        return;
+    }
+
+
+    preview.src =
+        URL.createObjectURL(file);
+
+    preview.style.display =
+        'block';
+
+});
 
 </script>
 

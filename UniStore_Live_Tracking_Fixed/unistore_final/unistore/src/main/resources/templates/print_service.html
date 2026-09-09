@@ -1,1 +1,473 @@
-<!DOCTYPE html><html xmlns:th="http://www.thymeleaf.org"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Print Service | UniStore</title><link rel="stylesheet" href="/css/style.css"></head><body><header class="topbar"><a class="brand" href="/store">Uni<span>Store</span></a><nav class="nav"><a href="/store">Store</a><a href="/orders">My Orders</a><a href="/logout">Logout</a></nav></header><main class="container"><section class="print-layout"><div class="form-card"><span class="eyebrow dark">CAMPUS PRINTING</span><h1>Print your documents</h1><p class="muted">Upload your assignment, record or notes. We'll prepare it for pickup at the college store.</p><div th:if="${error}" class="error" th:text="${error}"></div><form class="form" action="/upload_print_job" method="post" enctype="multipart/form-data"><label>Full name</label><input name="studentName" required placeholder="Your full name"><label>Class / Department</label><input name="userClass" required placeholder="e.g. S2 CSE"><label>Total pages</label><input type="number" name="pages" min="1" max="1000" required placeholder="Number of pages"><label>Print type</label><select name="printType"><option value="BW">Black & White — ₹2 / page</option><option value="COLOR">Colour — ₹10 / page</option></select><label>Document</label><input type="file" name="printFile" accept=".pdf,.doc,.docx" required><button class="btn green" type="submit">Upload & place print order</button></form></div><aside class="info-card"><div class="print-icon">🖨️</div><h2>Simple pricing</h2><div class="price-box"><span>Black & White</span><b>₹2/page</b></div><div class="price-box"><span>Colour</span><b>₹10/page</b></div><hr><p>Accepted formats: PDF, DOC, DOCX</p><p>Maximum file size: 5 MB</p><p>After placing the request, use <b>My Orders</b> to track it.</p></aside></section></main></body></html>
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Print Service | UniStore</title>
+
+    <link rel="stylesheet" href="/css/style.css">
+
+    <style>
+        .payment-section {
+            margin-top: 24px;
+            padding-top: 20px;
+            border-top: 1px solid #e5e5e5;
+        }
+
+        .payment-title {
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .payment-options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .payment-option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 16px;
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            cursor: pointer;
+            background: #fff;
+            transition: 0.2s ease;
+        }
+
+        .payment-option:hover {
+            border-color: #222;
+        }
+
+        .payment-option input[type="radio"] {
+            width: 18px;
+            height: 18px;
+            margin: 0;
+            cursor: pointer;
+        }
+
+        .payment-option-content {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .payment-option-title {
+            font-weight: 600;
+        }
+
+        .payment-option-subtitle {
+            font-size: 12px;
+            color: #777;
+        }
+
+        .payment-help {
+            margin-top: 12px;
+            font-size: 12px;
+            color: #777;
+            line-height: 1.5;
+        }
+
+        .print-submit {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+
+<body>
+
+<header class="topbar">
+
+    <a class="brand" href="/store">
+        Uni<span>Store</span>
+    </a>
+
+    <nav class="nav">
+        <a href="/store">Store</a>
+        <a href="/orders">My Orders</a>
+        <a href="/logout">Logout</a>
+    </nav>
+
+</header>
+
+
+<main class="container">
+
+    <section class="print-layout">
+
+
+        <!-- PRINT FORM -->
+
+        <div class="form-card">
+
+            <span class="eyebrow dark">
+                CAMPUS PRINTING
+            </span>
+
+
+            <h1>
+                Print your documents
+            </h1>
+
+
+            <p class="muted">
+                Upload your assignment, record or notes.
+                We'll prepare it for pickup at the college store.
+            </p>
+
+
+            <!-- ERROR -->
+
+            <div
+                th:if="${error}"
+                class="error"
+                th:text="${error}">
+            </div>
+
+
+            <!-- PRINT FORM -->
+
+            <form
+                id="printForm"
+                class="form"
+                action="/upload_print_job"
+                method="post"
+                enctype="multipart/form-data">
+
+
+                <!-- NAME -->
+
+                <label>
+                    Full name
+                </label>
+
+                <input
+                    name="studentName"
+                    required
+                    placeholder="Your full name">
+
+
+                <!-- CLASS -->
+
+                <label>
+                    Class / Department
+                </label>
+
+                <input
+                    name="userClass"
+                    required
+                    placeholder="e.g. S2 CSE">
+
+
+                <!-- PAGES -->
+
+                <label>
+                    Total pages
+                </label>
+
+                <input
+                    type="number"
+                    name="pages"
+                    min="1"
+                    max="1000"
+                    required
+                    placeholder="Number of pages">
+
+
+                <!-- PRINT TYPE -->
+
+                <label>
+                    Print type
+                </label>
+
+                <select
+                    name="printType"
+                    id="printType">
+
+                    <option value="BW">
+                        Black & White — ₹2 / page
+                    </option>
+
+                    <option value="COLOR">
+                        Colour — ₹10 / page
+                    </option>
+
+                </select>
+
+
+                <!-- DOCUMENT -->
+
+                <label>
+                    Document
+                </label>
+
+                <input
+                    type="file"
+                    name="printFile"
+                    accept=".pdf,.doc,.docx"
+                    required>
+
+
+                <!-- PAYMENT SECTION -->
+
+                <div class="payment-section">
+
+                    <div class="payment-title">
+                        Payment
+                    </div>
+
+
+                    <div class="payment-options">
+
+
+                        <!-- CAMPUS COUNTER -->
+
+                        <label class="payment-option">
+
+                            <input
+                                type="radio"
+                                name="paymentMethod"
+                                value="PAY_AT_COUNTER"
+                                checked
+                                onchange="changePaymentAction()">
+
+
+                            <div class="payment-option-content">
+
+                                <span class="payment-option-title">
+                                    Pay at Campus Counter
+                                </span>
+
+                                <span class="payment-option-subtitle">
+                                    Pay when you collect your printed documents
+                                </span>
+
+                            </div>
+
+                        </label>
+
+
+                        <!-- UPI -->
+
+                        <label class="payment-option">
+
+                            <input
+                                type="radio"
+                                name="paymentMethod"
+                                value="UPI_PAYMENT"
+                                onchange="changePaymentAction()">
+
+
+                            <div class="payment-option-content">
+
+                                <span class="payment-option-title">
+                                    UPI Payment
+                                </span>
+
+                                <span class="payment-option-subtitle">
+                                    Continue to the UniStore UPI payment page
+                                </span>
+
+                            </div>
+
+                        </label>
+
+
+                    </div>
+
+
+                    <p class="payment-help">
+
+                        If you choose UPI, your document details will be
+                        carried to the payment page. You can then complete
+                        the demo payment and upload the payment screenshot.
+
+                    </p>
+
+                </div>
+
+
+                <!-- SUBMIT -->
+
+                <button
+                    id="printSubmitButton"
+                    class="btn green print-submit"
+                    type="submit">
+
+                    Upload & Place Print Order
+
+                </button>
+
+
+            </form>
+
+        </div>
+
+
+
+        <!-- INFORMATION -->
+
+        <aside class="info-card">
+
+            <div class="print-icon">
+                🖨️
+            </div>
+
+
+            <h2>
+                Simple pricing
+            </h2>
+
+
+            <div class="price-box">
+
+                <span>
+                    Black & White
+                </span>
+
+                <b>
+                    ₹2/page
+                </b>
+
+            </div>
+
+
+            <div class="price-box">
+
+                <span>
+                    Colour
+                </span>
+
+                <b>
+                    ₹10/page
+                </b>
+
+            </div>
+
+
+            <hr>
+
+
+            <p>
+                Accepted formats:
+                PDF, DOC, DOCX
+            </p>
+
+
+            <p>
+                Maximum file size:
+                5 MB
+            </p>
+
+
+            <p>
+                After placing the request, use
+                <b>My Orders</b>
+                to track it.
+            </p>
+
+
+            <p>
+                Payment options:
+                <b>Campus Counter</b>
+                or
+                <b>UPI</b>
+            </p>
+
+        </aside>
+
+
+    </section>
+
+</main>
+
+
+
+<script>
+
+    function changePaymentAction() {
+
+        const form =
+            document.getElementById("printForm");
+
+        const button =
+            document.getElementById(
+                "printSubmitButton"
+            );
+
+
+        const selected =
+            document.querySelector(
+                'input[name="paymentMethod"]:checked'
+            );
+
+
+        if (!selected) {
+            return;
+        }
+
+
+        /*
+         * Campus Counter:
+         *
+         * The existing print controller will
+         * receive the uploaded document and
+         * create the order.
+         */
+
+        if (
+            selected.value ===
+            "PAY_AT_COUNTER"
+        ) {
+
+            form.action =
+                "/upload_print_job";
+
+            button.textContent =
+                "Upload & Place Print Order";
+
+        }
+
+
+        /*
+         * UPI:
+         *
+         * The print information needs to be
+         * sent to the UPI payment page first.
+         */
+
+        else if (
+            selected.value ===
+            "UPI_PAYMENT"
+        ) {
+
+            form.action =
+                "/upi-payment";
+
+            button.textContent =
+                "Continue to UPI Payment";
+
+        }
+
+    }
+
+
+    document.addEventListener(
+        "DOMContentLoaded",
+        function () {
+
+            changePaymentAction();
+
+        }
+    );
+
+</script>
+
+
+</body>
+</html>

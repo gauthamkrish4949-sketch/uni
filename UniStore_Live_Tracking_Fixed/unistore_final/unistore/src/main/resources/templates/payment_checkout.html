@@ -1,13 +1,251 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head><title>Payment Summary</title></head>
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+    name="viewport"
+    content="width=device-width,initial-scale=1">
+
+<title>UPI Payment | UniStore</title>
+
+<link
+    rel="stylesheet"
+    href="/css/style.css">
+
+</head>
+
 <body>
-    <h2>Print Job Order Created</h2>
-    <p><strong>Student:</strong> <span th:text="${order.studentName}"></span></p>
-    <p><strong>Class:</strong> <span th:text="${order.userClass}"></span></p>
-    <p><strong>Details:</strong> <span th:text="${order.details}"></span></p>
-    <h3>Total Payable Amount: ₹<span th:text="${order.totalAmount}"></span></h3>
-    <p>Please pay at the store counter upon document pickup.</p>
-    <a href="/store">Back to Store</a>
+
+<header class="topbar">
+
+    <a class="brand" href="/store">
+        Uni<span>Store</span>
+    </a>
+
+    <nav class="nav">
+        <a href="/store">Home</a>
+        <a href="/cart">Cart</a>
+        <a href="/orders">My Orders</a>
+        <a href="/logout">Logout</a>
+    </nav>
+
+</header>
+
+
+<main class="container payment-page">
+
+<section class="payment-card payment-card-centered">
+
+    <span class="eyebrow dark">
+        DEMO UPI PAYMENT
+    </span>
+
+    <h1>
+        Complete your payment
+    </h1>
+
+    <p class="muted">
+        This is an academic project demo.
+        Use the image below as the payment
+        placeholder, then upload your
+        payment screenshot.
+    </p>
+
+
+    <div class="payment-amount">
+
+        <span>
+            Amount to pay
+        </span>
+
+        <strong>
+            ₹<span
+                th:text="${#numbers.formatDecimal(total,1,2)}">
+                0.00
+            </span>
+        </strong>
+
+    </div>
+
+
+    <div class="fake-qr-wrap">
+
+        <div class="fake-qr-label">
+            SCAN &amp; PAY
+        </div>
+
+        <img
+            th:src="@{/images/payment-demo.jpg}"
+            alt="Demo payment image">
+
+        <p>
+            😎 <b>Totally legitimate QR</b>
+        </p>
+
+        <small>
+            Just a sarcastic image for
+            the college project demo.
+        </small>
+
+    </div>
+
+
+    <div class="payment-details centered-details">
+
+        <div>
+            <span>Student</span>
+
+            <b th:text="${studentName}">
+                Student
+            </b>
+        </div>
+
+        <div>
+            <span>Class / Department</span>
+
+            <b th:text="${userClass}">
+                Class
+            </b>
+        </div>
+
+    </div>
+
+
+    <form
+        class="form payment-upload-form centered-upload"
+        action="/checkout_stationery"
+        method="post"
+        enctype="multipart/form-data">
+
+
+        <input
+            type="hidden"
+            name="studentName"
+            th:value="${studentName}">
+
+
+        <input
+            type="hidden"
+            name="userClass"
+            th:value="${userClass}">
+
+
+        <input
+            type="hidden"
+            name="paymentMethod"
+            value="UPI_PAYMENT">
+
+
+        <label for="paymentScreenshot">
+            Upload payment screenshot
+        </label>
+
+
+        <input
+            id="paymentScreenshot"
+            type="file"
+            name="paymentScreenshot"
+            accept="image/jpeg,image/png,image/webp"
+            required>
+
+
+        <p class="tiny">
+            JPG, PNG or WEBP • Maximum 5 MB
+        </p>
+
+
+        <img
+            id="screenshotPreview"
+            class="screenshot-preview"
+            alt="Payment screenshot preview"
+            style="display:none">
+
+
+        <button
+            class="btn green full"
+            type="submit">
+
+            ✓ I Have Paid – Complete Order
+
+        </button>
+
+    </form>
+
+
+    <a
+        class="cancel-payment"
+        href="/cart">
+
+        ← Back to cart
+
+    </a>
+
+</section>
+
+</main>
+
+
+<script>
+
+const input =
+    document.getElementById(
+        'paymentScreenshot'
+    );
+
+const preview =
+    document.getElementById(
+        'screenshotPreview'
+    );
+
+
+input.addEventListener(
+    'change',
+    () => {
+
+        const file =
+            input.files[0];
+
+        if (!file) {
+
+            preview.style.display =
+                'none';
+
+            return;
+        }
+
+
+        if (
+            file.size >
+            5 * 1024 * 1024
+        ) {
+
+            alert(
+                'Please choose an image smaller than 5 MB.'
+            );
+
+            input.value = '';
+
+            preview.style.display =
+                'none';
+
+            return;
+        }
+
+
+        preview.src =
+            URL.createObjectURL(file);
+
+        preview.style.display =
+            'block';
+
+    }
+);
+
+</script>
+
 </body>
+
 </html>

@@ -1,1 +1,485 @@
-<!DOCTYPE html><html xmlns:th="http://www.thymeleaf.org"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Your Cart | UniStore</title><link rel="stylesheet" href="/css/style.css"></head><body><header class="topbar"><a class="brand" href="/store">Uni<span>Store</span></a><nav class="nav"><a href="/store">Continue Shopping</a><a href="/orders">My Orders</a><a href="/logout">Logout</a></nav></header><main class="container"><div class="section-head"><div><span class="eyebrow dark">YOUR BAG</span><h1>Shopping Cart</h1></div></div><p th:if="${error}" class="error" th:text="${error}"></p><div th:if="${cart_items.isEmpty()}" class="empty"><div>🛒</div><h2>Your cart is empty</h2><p class="muted">Find something useful for your next class.</p><a class="btn" href="/store">Start shopping</a></div><div th:unless="${cart_items.isEmpty()}" class="cart-layout"><div class="cart-list"><article class="cart-item" th:each="item:${cart_items}"><div class="mini-img">📦</div><div class="cart-info"><h3 th:text="${item.productName}">Item</h3><span>₹<span th:text="${#numbers.formatDecimal(item.price,1,2)}">0</span> each</span><form class="qty-form" th:action="@{/cart/update/{id}(id=${item.id})}" method="post"><input type="number" name="quantity" min="0" th:value="${item.quantity}"><button class="link-btn" type="submit">Update</button></form></div><div class="cart-side"><b>₹<span th:text="${#numbers.formatDecimal(item.price*item.quantity,1,2)}">0</span></b><form th:action="@{/cart/remove/{id}(id=${item.id})}" method="post"><button class="remove-btn">Remove</button></form></div></article></div><aside class="checkout-card"><span class="eyebrow dark">CHECKOUT</span><h2>Order summary</h2><div class="summary-line"><span>Items total</span><b>₹<span th:text="${#numbers.formatDecimal(total,1,2)}">0</span></b></div><div class="summary-line"><span>Campus pickup</span><b>FREE</b></div><hr><div class="summary-total"><span>Total</span><strong>₹<span th:text="${#numbers.formatDecimal(total,1,2)}">0</span></strong></div><form class="form" action="/checkout_stationery" method="post"><label>Student name</label><input name="studentName" required placeholder="Your full name"><label>Class / Department</label><input name="userClass" required placeholder="e.g. S2 CSE"><label>Payment</label><select name="paymentMethod"><option value="PAY_AT_COUNTER">Pay at campus counter</option><option value="UPI_AT_COUNTER">UPI at campus counter</option></select><button class="btn green full" type="submit">Place order</button></form><p class="tiny">Payment is handled at the college store counter for this academic demo.</p></aside></div></main></body></html>
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Your Cart | UniStore</title>
+
+    <link rel="stylesheet" href="/css/style.css">
+
+    <style>
+        /* Payment section */
+        .payment-options {
+            margin-top: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .payment-option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 16px;
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: 0.2s ease;
+            background: #fff;
+        }
+
+        .payment-option:hover {
+            border-color: #222;
+        }
+
+        .payment-option input[type="radio"] {
+            width: 18px;
+            height: 18px;
+            margin: 0;
+            cursor: pointer;
+        }
+
+        .payment-option-content {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .payment-option-title {
+            font-weight: 600;
+            font-size: 15px;
+        }
+
+        .payment-option-subtitle {
+            font-size: 12px;
+            color: #777;
+        }
+
+        .checkout-card .form {
+            margin-top: 18px;
+        }
+
+        .payment-note {
+            margin-top: 12px;
+            text-align: center;
+            font-size: 12px;
+            color: #777;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+
+
+<body>
+
+<header class="topbar">
+
+    <a class="brand" href="/store">
+        Uni<span>Store</span>
+    </a>
+
+    <nav class="nav">
+        <a href="/store">Continue Shopping</a>
+        <a href="/orders">My Orders</a>
+        <a href="/logout">Logout</a>
+    </nav>
+
+</header>
+
+
+<main class="container">
+
+    <div class="section-head">
+
+        <div>
+            <span class="eyebrow dark">YOUR BAG</span>
+            <h1>Shopping Cart</h1>
+        </div>
+
+    </div>
+
+
+    <!-- Error message -->
+
+    <p
+        th:if="${error}"
+        class="error"
+        th:text="${error}">
+    </p>
+
+
+    <!-- EMPTY CART -->
+
+    <div
+        th:if="${cart_items.isEmpty()}"
+        class="empty">
+
+        <div>🛒</div>
+
+        <h2>Your cart is empty</h2>
+
+        <p class="muted">
+            Find something useful for your next class.
+        </p>
+
+        <a
+            class="btn"
+            href="/store">
+            Start shopping
+        </a>
+
+    </div>
+
+
+    <!-- CART -->
+
+    <div
+        th:unless="${cart_items.isEmpty()}"
+        class="cart-layout">
+
+
+        <!-- CART ITEMS -->
+
+        <div class="cart-list">
+
+            <article
+                class="cart-item"
+                th:each="item : ${cart_items}">
+
+
+                <div class="mini-img">
+                    📦
+                </div>
+
+
+                <div class="cart-info">
+
+                    <h3
+                        th:text="${item.productName}">
+                        Item
+                    </h3>
+
+
+                    <span>
+                        ₹<span
+                            th:text="${#numbers.formatDecimal(item.price,1,2)}">
+                            0
+                        </span>
+                        each
+                    </span>
+
+
+                    <form
+                        class="qty-form"
+                        th:action="@{/cart/update/{id}(id=${item.id})}"
+                        method="post">
+
+                        <input
+                            type="number"
+                            name="quantity"
+                            min="0"
+                            th:value="${item.quantity}">
+
+                        <button
+                            class="link-btn"
+                            type="submit">
+                            Update
+                        </button>
+
+                    </form>
+
+                </div>
+
+
+                <div class="cart-side">
+
+                    <b>
+                        ₹<span
+                            th:text="${#numbers.formatDecimal(item.price * item.quantity,1,2)}">
+                            0
+                        </span>
+                    </b>
+
+
+                    <form
+                        th:action="@{/cart/remove/{id}(id=${item.id})}"
+                        method="post">
+
+                        <button
+                            class="remove-btn"
+                            type="submit">
+                            Remove
+                        </button>
+
+                    </form>
+
+                </div>
+
+            </article>
+
+        </div>
+
+
+        <!-- CHECKOUT -->
+
+        <aside class="checkout-card">
+
+            <span class="eyebrow dark">
+                CHECKOUT
+            </span>
+
+
+            <h2>
+                Order summary
+            </h2>
+
+
+            <!-- ITEM TOTAL -->
+
+            <div class="summary-line">
+
+                <span>
+                    Items total
+                </span>
+
+                <b>
+                    ₹<span
+                        th:text="${#numbers.formatDecimal(total,1,2)}">
+                        0
+                    </span>
+                </b>
+
+            </div>
+
+
+            <!-- PICKUP -->
+
+            <div class="summary-line">
+
+                <span>
+                    Campus pickup
+                </span>
+
+                <b>
+                    FREE
+                </b>
+
+            </div>
+
+
+            <hr>
+
+
+            <!-- TOTAL -->
+
+            <div class="summary-total">
+
+                <span>
+                    Total
+                </span>
+
+                <strong>
+                    ₹<span
+                        th:text="${#numbers.formatDecimal(total,1,2)}">
+                        0
+                    </span>
+                </strong>
+
+            </div>
+
+
+            <!-- STUDENT DETAILS -->
+
+            <form
+                id="checkoutForm"
+                class="form"
+                method="post">
+
+
+                <label>
+                    Student name
+                </label>
+
+                <input
+                    name="studentName"
+                    required
+                    placeholder="Your full name">
+
+
+                <label>
+                    Class / Department
+                </label>
+
+                <input
+                    name="userClass"
+                    required
+                    placeholder="e.g. S2 CSE">
+
+
+                <!-- PAYMENT -->
+
+                <label>
+                    Payment
+                </label>
+
+
+                <div class="payment-options">
+
+
+                    <!-- CAMPUS COUNTER -->
+
+                    <label class="payment-option">
+
+                        <input
+                            type="radio"
+                            name="paymentMethod"
+                            value="PAY_AT_COUNTER"
+                            checked
+                            onchange="changePaymentAction()">
+
+
+                        <div class="payment-option-content">
+
+                            <span class="payment-option-title">
+                                Pay at Campus Counter
+                            </span>
+
+                            <span class="payment-option-subtitle">
+                                Pay when you collect your order
+                            </span>
+
+                        </div>
+
+                    </label>
+
+
+                    <!-- UPI -->
+
+                    <label class="payment-option">
+
+                        <input
+                            type="radio"
+                            name="paymentMethod"
+                            value="UPI_PAYMENT"
+                            onchange="changePaymentAction()">
+
+
+                        <div class="payment-option-content">
+
+                            <span class="payment-option-title">
+                                UPI Payment
+                            </span>
+
+                            <span class="payment-option-subtitle">
+                                Continue to the UniStore payment page
+                            </span>
+
+                        </div>
+
+                    </label>
+
+
+                </div>
+
+
+                <!-- SUBMIT BUTTON -->
+
+                <button
+                    id="paymentButton"
+                    class="btn green full"
+                    type="submit">
+
+                    Place Order
+
+                </button>
+
+
+            </form>
+
+
+            <p class="payment-note">
+
+                For UPI payment, you will be taken to a separate
+                payment page where you can complete the demo payment
+                and upload your screenshot.
+
+            </p>
+
+        </aside>
+
+    </div>
+
+</main>
+
+
+<script>
+
+    function changePaymentAction() {
+
+        const form =
+            document.getElementById("checkoutForm");
+
+        const button =
+            document.getElementById("paymentButton");
+
+        const selected =
+            document.querySelector(
+                'input[name="paymentMethod"]:checked'
+            );
+
+
+        if (!selected) {
+            return;
+        }
+
+
+        if (selected.value === "UPI_PAYMENT") {
+
+            /*
+             * UPI goes to the intermediate
+             * payment page.
+             */
+
+            form.action = "/upi-payment";
+
+            button.textContent =
+                "Continue to UPI Payment";
+
+        } else {
+
+            /*
+             * Campus counter goes directly
+             * to order creation.
+             */
+
+            form.action =
+                "/checkout_stationery";
+
+            button.textContent =
+                "Place Order";
+        }
+
+    }
+
+
+    /*
+     * Set the correct action when
+     * the page initially loads.
+     */
+
+    document.addEventListener(
+        "DOMContentLoaded",
+        function () {
+
+            changePaymentAction();
+
+        }
+    );
+
+</script>
+
+
+</body>
+</html>
